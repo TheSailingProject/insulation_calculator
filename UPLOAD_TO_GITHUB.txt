@@ -1,0 +1,108 @@
+================================================================================
+         UPLOAD TO GITHUB - QUICK REFERENCE
+================================================================================
+
+STATUS: ✅ Git initialized, files staged and ready!
+
+YOUR NEXT 3 STEPS:
+================================================================================
+
+STEP 1: Configure Git
+----------------------
+Run ONE of these:
+
+Option A (Easy):
+    .\setup_git.bat
+
+Option B (Manual):
+    git config --global user.name "Your Name"
+    git config --global user.email "your.email@example.com"
+
+
+STEP 2: Create Commit
+----------------------
+    git commit -m "Initial commit: Belgian Roof Insulation Calculator"
+
+
+STEP 3: Create GitHub Repo and Push
+------------------------------------
+a) Go to: https://github.com/new
+
+b) Create repository:
+   - Name: belgian-insulation-calculator
+   - Visibility: Public
+   - Don't check any boxes
+
+c) Run these commands (replace YOUR-USERNAME):
+   git remote add origin https://github.com/YOUR-USERNAME/belgian-insulation-calculator.git
+   git branch -M main
+   git push -u origin main
+
+
+================================================================================
+AUTHENTICATION
+================================================================================
+
+When pushing, GitHub will ask for credentials:
+- Username: Your GitHub username
+- Password: Use PERSONAL ACCESS TOKEN (not your password!)
+
+Get token from: https://github.com/settings/tokens
+- Click "Generate new token (classic)"
+- Select scope: repo
+- Copy and save the token
+- Use it as password when Git asks
+
+
+================================================================================
+AFTER UPLOAD
+================================================================================
+
+Deploy to Cloudflare:
+
+1. Deploy Worker:
+   cd cloudflare-deployment/worker
+   wrangler deploy
+
+2. Deploy Pages:
+   - Go to https://dash.cloudflare.com/
+   - Workers & Pages → Create → Pages
+   - Connect to Git → Select your repo
+   - Deploy!
+
+
+================================================================================
+HELP
+================================================================================
+
+Detailed guides in your project:
+- GITHUB_STEPS.md - Step-by-step instructions
+- GITHUB_UPLOAD_GUIDE.md - Complete guide
+- cloudflare-deployment/QUICKSTART.md - Cloudflare deployment
+
+Stuck? Check browser console or run:
+    git status
+
+
+================================================================================
+SUMMARY
+================================================================================
+
+✅ What's done:
+   - Git initialized
+   - Files staged (ready to commit)
+   - .gitignore configured
+   - Documentation created
+
+⏳ What you need to do:
+   1. Configure Git (name/email)
+   2. Create commit
+   3. Create GitHub repo
+   4. Push to GitHub
+
+⏱️ Time needed: ~5 minutes
+💰 Cost: FREE
+
+================================================================================
+
+Ready? Start with STEP 1 above! 🚀

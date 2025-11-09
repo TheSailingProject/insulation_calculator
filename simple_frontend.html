@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belgian Roof Insulation Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1a5490;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1a5490;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #1a5490;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #134070;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 84, 144, 0.3);
+        }
+
+        .btn-success {
+            background: #228b22;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7a1e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 139, 34, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results h2 {
+            color: #1a5490;
+            margin-bottom: 20px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #1a5490, #2a6ab0);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .result-card.green {
+            background: linear-gradient(135deg, #228b22, #3a9b3a);
+        }
+
+        .result-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .result-unit {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #1976d2;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a5490;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Belgian Roof Insulation Calculator</h1>
+        <p class="subtitle">Calculate your energy savings and environmental impact</p>
+
+        <div id="error-message"></div>
+
+        <form id="calculator-form">
+            <div class="form-group">
+                <label for="location">Belgian Region *</label>
+                <select id="location" required>
+                    <option value="">-- Select a region --</option>
+                    <option value="Vlaams">Vlaams</option>
+                    <option value="Waals">Waals</option>
+                    <option value="Brussels-Hoofdstedelijk">Brussels-Hoofdstedelijk</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="roof_area">Roof Area (m²) *</label>
+                <input type="number" id="roof_area" placeholder="e.g., 100" step="0.01" min="0" required>
+                <div class="helper-text">Total area of your roof in square meters</div>
+            </div>
+
+            <div class="form-group">
+                <label for="current_r_value">Current R-value (m²·K/W) *</label>
+                <input type="number" id="current_r_value" placeholder="e.g., 2.0" step="0.1" min="0" required>
+                <div class="helper-text">Thermal resistance of current insulation (0 if no insulation)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="proposed_r_value">Proposed R-value (m²·K/W) *</label>
+                <input type="number" id="proposed_r_value" placeholder="e.g., 6.0" step="0.1" min="0" required>
+                <div class="helper-text">Target R-value after insulation upgrade</div>
+            </div>
+
+            <div class="form-group">
+                <label for="heating_source">Heating Source *</label>
+                <select id="heating_source" required>
+                    <option value="">-- Select heating source --</option>
+                    <option value="gas">Natural Gas</option>
+                    <option value="oil">Heating Oil</option>
+                    <option value="electric">Electric Heating</option>
+                    <option value="heat_pump">Heat Pump</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="energy_price">Energy Price (€/kWh) *</label>
+                <input type="number" id="energy_price" placeholder="e.g., 0.35" step="0.001" min="0" required>
+                <div class="helper-text">Your current average energy price per kilowatt-hour</div>
+            </div>
+
+            <div class="form-group">
+                <label for="insulation_cost">Insulation Upgrade Cost (€) <em>(Optional)</em></label>
+                <input type="number" id="insulation_cost" placeholder="Leave empty for automatic estimate" step="1" min="0">
+                <div class="helper-text">Total cost of insulation project (auto-estimated at €45/m² if empty)</div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-primary" id="calculate-btn">
+                    Calculate Savings
+                </button>
+            </div>
+        </form>
+
+        <div id="results" class="results">
+            <h2>Your Savings Analysis</h2>
+            <div class="result-grid">
+                <div class="result-card">
+                    <div class="result-label">Annual Savings</div>
+                    <div class="result-value" id="annual_savings">-</div>
+                    <div class="result-unit">€ per year</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Payback Period</div>
+                    <div class="result-value" id="payback">-</div>
+                    <div class="result-unit">years</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">10-Year Savings</div>
+                    <div class="result-value" id="ten_year">-</div>
+                    <div class="result-unit">€ total</div>
+                </div>
+                <div class="result-card green">
+                    <div class="result-label">CO₂ Reduction</div>
+                    <div class="result-value" id="co2">-</div>
+                    <div class="result-unit">kg/year</div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn-success" id="download-pdf-btn">
+                    📄 Download PDF Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        // Auto-fill energy price based on region
+        document.getElementById('location').addEventListener('change', function() {
+            const prices = {
+                'Vlaams': '0.350',
+                'Waals': '0.330',
+                'Brussels-Hoofdstedelijk': '0.340'
+            };
+            const energyPriceInput = document.getElementById('energy_price');
+            if (prices[this.value]) {
+                energyPriceInput.value = prices[this.value];
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('calculator-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const errorDiv = document.getElementById('error-message');
+            const resultsDiv = document.getElementById('results');
+            const calculateBtn = document.getElementById('calculate-btn');
+
+            errorDiv.innerHTML = '';
+            resultsDiv.classList.remove('show');
+
+            // Get form data
+            const formData = {
+                location: document.getElementById('location').value,
+                roof_area: parseFloat(document.getElementById('roof_area').value),
+                current_r_value: parseFloat(document.getElementById('current_r_value').value),
+                proposed_r_value: parseFloat(document.getElementById('proposed_r_value').value),
+                heating_source: document.getElementById('heating_source').value,
+                energy_price_per_kwh: parseFloat(document.getElementById('energy_price').value),
+                insulation_upgrade_cost: document.getElementById('insulation_cost').value
+                    ? parseFloat(document.getElementById('insulation_cost').value)
+                    : null
+            };
+
+            // Validate
+            if (formData.proposed_r_value <= formData.current_r_value) {
+                errorDiv.innerHTML = '<div class="alert alert-error">Proposed R-value must be greater than current R-value</div>';
+                return;
+            }
+
+            // Show loading
+            calculateBtn.disabled = true;
+            calculateBtn.textContent = 'Calculating...';
+
+            try {
+                const response = await fetch(`${API_URL}/calculate/savings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Calculation failed');
+                }
+
+                const results = await response.json();
+
+                // Display results
+                document.getElementById('annual_savings').textContent = '€' + results.annual_cost_savings.toFixed(2);
+                document.getElementById('payback').textContent = results.payback_period.toFixed(1);
+                document.getElementById('ten_year').textContent = '€' + results.ten_year_total_savings.toFixed(2);
+                document.getElementById('co2').textContent = results.annual_co2_reduction.toFixed(0);
+
+                resultsDiv.classList.add('show');
+                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+
+                // Store form data for PDF download
+                window.calculationData = formData;
+
+            } catch (error) {
+                errorDiv.innerHTML = `<div class="alert alert-error"><strong>Error:</strong> ${error.message}</div>`;
+            } finally {
+                calculateBtn.disabled = false;
+                calculateBtn.textContent = 'Calculate Savings';
+            }
+        });
+
+        // Handle PDF download
+        document.getElementById('download-pdf-btn').addEventListener('click', async function() {
+            if (!window.calculationData) {
+                alert('Please calculate savings first');
+                return;
+            }
+
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = 'Generating PDF...';
+
+            try {
+                const response = await fetch(`${API_URL}/calculate/pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(window.calculationData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate PDF');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'insulation_savings_report.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📄 Download PDF Report';
+            }
+        });
+
+        // Check if backend is running
+        fetch(`${API_URL}/`)
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('error-message').innerHTML =
+                        '<div class="alert alert-info">✓ Connected to backend API</div>';
+                    setTimeout(() => {
+                        document.getElementById('error-message').innerHTML = '';
+                    }, 3000);
+                }
+            })
+            .catch(() => {
+                document.getElementById('error-message').innerHTML =
+                    '<div class="alert alert-error"><strong>Backend not running!</strong> Please start the backend server first: <code>cd backend && py main.py</code></div>';
+            });
+    </script>
+</body>
+</html>
