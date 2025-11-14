@@ -27,7 +27,8 @@ export const validateRoofArea = (area) => {
 };
 
 export const validateRValue = (rValue, label = 'R-value') => {
-  if (!rValue || rValue === '') {
+  // Allow 0 as valid value (no insulation), but not empty string
+  if (rValue === '' || rValue === null || rValue === undefined) {
     return `Please enter ${label}`;
   }
   const numRValue = parseFloat(rValue);
