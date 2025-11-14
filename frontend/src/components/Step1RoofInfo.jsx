@@ -22,9 +22,14 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
     if (field === 'has_insulation') {
       if (value === 'no') {
         updatedFormData.current_r_value = '0';
+        // Clear any existing error on current_r_value since we're auto-setting it to 0
+        setErrors({ ...errors, current_r_value: null, [field]: null });
       } else if (value === 'yes' && formData.current_r_value === '0') {
         updatedFormData.current_r_value = '';
+        setErrors({ ...errors, [field]: null });
       }
+      setFormData(updatedFormData);
+      return; // Exit early after handling has_insulation
     }
 
     setFormData(updatedFormData);
