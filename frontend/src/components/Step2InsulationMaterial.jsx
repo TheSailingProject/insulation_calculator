@@ -2,6 +2,9 @@ import React from 'react';
 import { validateInsulationMaterial } from '../utils/validation';
 
 // Belgian market insulation materials with realistic pricing
+// Target R-value of 6.0 meets Belgian EPB 2023 standards for new buildings
+const TARGET_R_VALUE = 6.0;
+
 const INSULATION_MATERIALS = [
   {
     id: 'glass_wool',
@@ -9,6 +12,7 @@ const INSULATION_MATERIALS = [
     category: 'Budget',
     cost_per_m2: 17.5,
     r_value_per_cm: 0.035,
+    target_r_value: TARGET_R_VALUE,
     description: 'Cost-effective traditional insulation. Good thermal performance.',
     benefits: ['Most affordable option', 'Easy to install', 'Fire resistant', 'Good sound insulation'],
     icon: 'budget'
@@ -19,6 +23,7 @@ const INSULATION_MATERIALS = [
     category: 'Mid-Range',
     cost_per_m2: 35,
     r_value_per_cm: 0.028,
+    target_r_value: TARGET_R_VALUE,
     description: 'Excellent thermal performance with thin profile. Popular choice.',
     benefits: ['High R-value per cm', 'Moisture resistant', 'Thin profile saves space', 'Long lifespan'],
     icon: 'standard'
@@ -29,6 +34,7 @@ const INSULATION_MATERIALS = [
     category: 'Premium Eco',
     cost_per_m2: 55,
     r_value_per_cm: 0.038,
+    target_r_value: TARGET_R_VALUE,
     description: 'Sustainable ecological insulation. Excellent moisture regulation.',
     benefits: ['Eco-friendly & sustainable', 'Breathable material', 'Summer heat protection', 'Carbon negative'],
     icon: 'premium'
@@ -39,6 +45,7 @@ const INSULATION_MATERIALS = [
     category: 'Mid-Range Plus',
     cost_per_m2: 28,
     r_value_per_cm: 0.032,
+    target_r_value: TARGET_R_VALUE,
     description: 'Enhanced EPS with graphite for better insulation. Great value.',
     benefits: ['Good price-performance', 'Lightweight', 'Easy to cut and fit', 'Water resistant'],
     icon: 'standard'
@@ -47,11 +54,21 @@ const INSULATION_MATERIALS = [
 
 const Step2InsulationMaterial = ({ formData, setFormData, errors, setErrors }) => {
   const handleMaterialSelect = (material) => {
-    setFormData({ ...formData, insulation_material: material.id });
+    // Set the material and the proposed R-value based on material target
+    setFormData({
+      ...formData,
+      insulation_material: material.id,
+      proposed_r_value: material.target_r_value.toString()
+    });
 
     // Clear error
     const error = validateInsulationMaterial(material.id);
     setErrors({ ...errors, insulation_material: error });
+  };
+
+  const calculateThickness = (material) => {
+    // Thickness (cm) = Target R-value / R-value per cm
+    return material.target_r_value / material.r_value_per_cm;
   };
 
   const calculateInsulationCost = (material) => {
@@ -130,7 +147,10 @@ const Step2InsulationMaterial = ({ formData, setFormData, errors, setErrors }) =
 
               <div className="material-specs">
                 <div className="material-spec-item">
-                  <strong>R-value:</strong> {material.r_value_per_cm.toFixed(3)} m²·K/W per cm
+                  <strong>Target R-value:</strong> {material.target_r_value.toFixed(1)} m²·K/W
+                </div>
+                <div className="material-spec-item">
+                  <strong>Thickness needed:</strong> ~{calculateThickness(material).toFixed(0)} cm
                 </div>
               </div>
 

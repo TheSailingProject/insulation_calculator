@@ -10,7 +10,6 @@ import {
   validateLocation,
   validateRoofArea,
   validateRValue,
-  validateProposedRValue,
   validateHeatingSource,
   validateEnergyPrice,
   validateRoofType,
@@ -23,6 +22,7 @@ function App() {
     location: '',
     roof_area: '',
     roof_type: '',
+    has_insulation: '',
     current_r_value: '',
     proposed_r_value: '',
     insulation_material: '',
@@ -62,14 +62,20 @@ function App() {
       // Validate all Step 1 fields
       newErrors.roof_area = validateRoofArea(formData.roof_area);
       newErrors.roof_type = validateRoofType(formData.roof_type);
-      newErrors.current_r_value = validateRValue(
-        formData.current_r_value,
-        'Current R-value'
-      );
-      newErrors.proposed_r_value = validateProposedRValue(
-        formData.current_r_value,
-        formData.proposed_r_value
-      );
+
+      // Validate has_insulation selection
+      if (!formData.has_insulation) {
+        newErrors.has_insulation = 'Please select whether your roof is currently insulated';
+      }
+
+      // Only validate current R-value if roof has insulation
+      if (formData.has_insulation === 'yes') {
+        newErrors.current_r_value = validateRValue(
+          formData.current_r_value,
+          'Current R-value'
+        );
+      }
+
       newErrors.location = validateLocation(formData.location);
     } else if (step === 2) {
       // Validate insulation material selection
@@ -145,6 +151,7 @@ function App() {
       location: '',
       roof_area: '',
       roof_type: '',
+      has_insulation: '',
       current_r_value: '',
       proposed_r_value: '',
       insulation_material: '',

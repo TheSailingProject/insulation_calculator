@@ -2,7 +2,6 @@ import React from 'react';
 import {
   validateRoofArea,
   validateRValue,
-  validateProposedRValue,
   validateLocation,
   validateRoofType
 } from '../utils/validation';
@@ -19,6 +18,15 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
       }
     }
 
+    // If insulation status changes to "no", reset current R-value to 0
+    if (field === 'has_insulation') {
+      if (value === 'no') {
+        updatedFormData.current_r_value = '0';
+      } else if (value === 'yes' && formData.current_r_value === '0') {
+        updatedFormData.current_r_value = '';
+      }
+    }
+
     setFormData(updatedFormData);
 
     // Validate based on field
@@ -27,8 +35,6 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
       error = validateRoofArea(value);
     } else if (field === 'current_r_value') {
       error = validateRValue(value, 'Current R-value');
-    } else if (field === 'proposed_r_value') {
-      error = validateProposedRValue(formData.current_r_value, value);
     } else if (field === 'location') {
       error = validateLocation(value);
     } else if (field === 'roof_type') {
@@ -108,47 +114,68 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
         </span>
       </div>
 
-      {/* Current R-value */}
+      {/* Current Insulation Status */}
       <div className="form-group">
-        <label htmlFor="current_r_value">Current R-value (m²·K/W) *</label>
-        <input
-          type="number"
-          id="current_r_value"
-          placeholder="e.g., 2.0"
-          value={formData.current_r_value}
-          onChange={(e) => handleFieldChange('current_r_value', e.target.value)}
-          className={errors.current_r_value ? 'error' : ''}
-          step="0.1"
-          min="0"
-        />
-        {errors.current_r_value && (
-          <span className="error-message">{errors.current_r_value}</span>
-        )}
+        <label>Is your roof currently insulated? *</label>
+        <div className="icon-selection-group">
+          <button
+            type="button"
+            className={`icon-selection-button ${formData.has_insulation === 'yes' ? 'selected' : ''}`}
+            onClick={() => handleFieldChange('has_insulation', 'yes')}
+          >
+            <div className="icon-selection-icon small">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 6 L28 16 L4 16 Z" fill="currentColor" opacity="0.3"/>
+                <rect x="6" y="16" width="20" height="3" fill="currentColor"/>
+                <rect x="6" y="19" width="20" height="4" fill="currentColor" opacity="0.6"/>
+              </svg>
+            </div>
+            <div className="icon-selection-label">Yes</div>
+            <div className="icon-selection-description">Has insulation</div>
+          </button>
+
+          <button
+            type="button"
+            className={`icon-selection-button ${formData.has_insulation === 'no' ? 'selected' : ''}`}
+            onClick={() => handleFieldChange('has_insulation', 'no')}
+          >
+            <div className="icon-selection-icon small">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 6 L28 16 L4 16 Z" fill="currentColor" opacity="0.3"/>
+                <rect x="6" y="16" width="20" height="2" fill="currentColor"/>
+              </svg>
+            </div>
+            <div className="icon-selection-label">No</div>
+            <div className="icon-selection-description">No insulation</div>
+          </button>
+        </div>
         <span className="helper-text">
-          Thermal resistance of your current insulation (0 if no insulation)
+          Tell us if your roof already has any insulation installed
         </span>
       </div>
 
-      {/* Proposed R-value */}
-      <div className="form-group">
-        <label htmlFor="proposed_r_value">Proposed R-value (m²·K/W) *</label>
-        <input
-          type="number"
-          id="proposed_r_value"
-          placeholder="e.g., 6.0"
-          value={formData.proposed_r_value}
-          onChange={(e) => handleFieldChange('proposed_r_value', e.target.value)}
-          className={errors.proposed_r_value ? 'error' : ''}
-          step="0.1"
-          min="0"
-        />
-        {errors.proposed_r_value && (
-          <span className="error-message">{errors.proposed_r_value}</span>
-        )}
-        <span className="helper-text">
-          Target R-value after insulation upgrade (must be higher than current)
-        </span>
-      </div>
+      {/* Current R-value - Only show if roof is insulated */}
+      {formData.has_insulation === 'yes' && (
+        <div className="form-group">
+          <label htmlFor="current_r_value">Current R-value (m²·K/W) *</label>
+          <input
+            type="number"
+            id="current_r_value"
+            placeholder="e.g., 2.0"
+            value={formData.current_r_value}
+            onChange={(e) => handleFieldChange('current_r_value', e.target.value)}
+            className={errors.current_r_value ? 'error' : ''}
+            step="0.1"
+            min="0"
+          />
+          {errors.current_r_value && (
+            <span className="error-message">{errors.current_r_value}</span>
+          )}
+          <span className="helper-text">
+            Thermal resistance of your current insulation (typically 1.0 - 4.0)
+          </span>
+        </div>
+      )}
 
       {/* Location Selection */}
       <div className="form-group">
@@ -187,15 +214,6 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
         )}
       </div>
 
-      {/* R-value improvement preview */}
-      {formData.current_r_value && formData.proposed_r_value && (
-        <div className="alert alert-success">
-          <strong>R-value Improvement:</strong>{' '}
-          {((parseFloat(formData.proposed_r_value) - parseFloat(formData.current_r_value)) /
-            parseFloat(formData.current_r_value) * 100).toFixed(0)}%
-          increase
-        </div>
-      )}
     </div>
   );
 };
