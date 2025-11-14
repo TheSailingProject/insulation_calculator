@@ -198,7 +198,7 @@ function App() {
       <div className="loading-overlay">
         <div className="loading-spinner">
           <div className="spinner"></div>
-          <p>Loading calculator...</p>
+          <p>Calculator laden...</p>
         </div>
       </div>
     );
@@ -208,8 +208,8 @@ function App() {
     <div className="app">
       <div className="container">
         <header className="header">
-          <h1>Belgian Roof Insulation Calculator</h1>
-          <p>Calculate your energy savings and environmental impact</p>
+          <h1>Tectura Isolatie Calculator</h1>
+          <p>Bereken uw energiebesparing en ecologische impact</p>
         </header>
 
         <div className="calculator-card">
@@ -261,7 +261,7 @@ function App() {
           <div className="button-group">
             {currentStep > 1 && currentStep < 4 && (
               <button className="btn btn-secondary" onClick={handleBack}>
-                ← Back
+                ← Vorige
               </button>
             )}
 
@@ -278,12 +278,12 @@ function App() {
                       className="spinner"
                       style={{ width: '16px', height: '16px', borderWidth: '2px' }}
                     ></div>
-                    Calculating...
+                    Berekenen...
                   </>
                 ) : currentStep === 3 ? (
-                  'Calculate Savings →'
+                  'Bereken besparingen →'
                 ) : (
-                  'Next →'
+                  'Volgende →'
                 )}
               </button>
             ) : (
@@ -292,7 +292,7 @@ function App() {
                 onClick={handleStartOver}
                 style={{ marginLeft: 'auto' }}
               >
-                ← Start Over
+                ← Opnieuw beginnen
               </button>
             )}
           </div>
@@ -300,9 +300,12 @@ function App() {
 
         <footer style={{ textAlign: 'center', padding: '20px', color: 'var(--text-secondary)' }}>
           <p style={{ fontSize: '0.875rem' }}>
-            This calculator provides estimates based on standard methods and regional averages.
+            Deze calculator geeft schattingen op basis van standaardmethoden en regionale gemiddelden.
             <br />
-            Consult with certified professionals for specific recommendations.
+            Raadpleeg gecertificeerde professionals voor specifieke aanbevelingen.
+          </p>
+          <p style={{ fontSize: '0.875rem', marginTop: '12px', fontWeight: '600' }}>
+            Powered by Tectura
           </p>
         </footer>
       </div>
@@ -311,7 +314,7 @@ function App() {
         <div className="loading-overlay">
           <div className="loading-spinner">
             <div className="spinner"></div>
-            <p>Calculating your savings...</p>
+            <p>Uw besparingen berekenen...</p>
           </div>
         </div>
       )}

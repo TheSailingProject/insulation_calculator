@@ -51,18 +51,18 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
 
   return (
     <div className="form-section">
-      <h2>Step 1: Roof Information</h2>
+      <h2>Stap 1: Dakinformatie</h2>
       <p className="helper-text" style={{ marginBottom: '20px' }}>
-        Tell us about your roof and location to calculate accurate savings.
+        Vertel ons over uw dak en locatie om nauwkeurige besparingen te berekenen.
       </p>
 
       {/* Roof Area Input */}
       <div className="form-group">
-        <label htmlFor="roof_area">Roof Area (m²) *</label>
+        <label htmlFor="roof_area">Dakoppervlakte (m²) *</label>
         <input
           type="number"
           id="roof_area"
-          placeholder="e.g., 100"
+          placeholder="bijv. 100"
           value={formData.roof_area}
           onChange={(e) => handleFieldChange('roof_area', e.target.value)}
           className={errors.roof_area ? 'error' : ''}
@@ -73,13 +73,13 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
           <span className="error-message">{errors.roof_area}</span>
         )}
         <span className="helper-text">
-          Enter the floor area of your roof in square meters
+          Voer de vloeroppervlakte van uw dak in vierkante meters in
         </span>
       </div>
 
       {/* Roof Type Selection */}
       <div className="form-group">
-        <label>Roof Type *</label>
+        <label>Daktype *</label>
         <div className="icon-selection-group">
           <button
             type="button"
@@ -92,8 +92,8 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
                 <rect x="6" y="24" width="36" height="2" fill="currentColor" opacity="0.6"/>
               </svg>
             </div>
-            <div className="icon-selection-label">Flat Roof</div>
-            <div className="icon-selection-description">1:1 surface area</div>
+            <div className="icon-selection-label">Plat dak</div>
+            <div className="icon-selection-description">1:1 oppervlakte</div>
           </button>
 
           <button
@@ -107,21 +107,21 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
                 <rect x="6" y="28" width="36" height="2" fill="currentColor" opacity="0.6"/>
               </svg>
             </div>
-            <div className="icon-selection-label">Pitched Roof</div>
-            <div className="icon-selection-description">~1.25x surface area</div>
+            <div className="icon-selection-label">Hellend dak</div>
+            <div className="icon-selection-description">~1.25x oppervlakte</div>
           </button>
         </div>
         {errors.roof_type && (
           <span className="error-message">{errors.roof_type}</span>
         )}
         <span className="helper-text">
-          Pitched roofs have larger surface area than their floor area
+          Hellende daken hebben een groter oppervlak dan hun vloeroppervlakte
         </span>
       </div>
 
       {/* Current Insulation Status */}
       <div className="form-group">
-        <label>Is your roof currently insulated? *</label>
+        <label>Is uw dak momenteel geïsoleerd? *</label>
         <div className="icon-selection-group">
           <button
             type="button"
@@ -135,8 +135,8 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
                 <rect x="6" y="19" width="20" height="4" fill="currentColor" opacity="0.6"/>
               </svg>
             </div>
-            <div className="icon-selection-label">Yes</div>
-            <div className="icon-selection-description">Has insulation</div>
+            <div className="icon-selection-label">Ja</div>
+            <div className="icon-selection-description">Heeft isolatie</div>
           </button>
 
           <button
@@ -150,23 +150,23 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
                 <rect x="6" y="16" width="20" height="2" fill="currentColor"/>
               </svg>
             </div>
-            <div className="icon-selection-label">No</div>
-            <div className="icon-selection-description">No insulation</div>
+            <div className="icon-selection-label">Nee</div>
+            <div className="icon-selection-description">Geen isolatie</div>
           </button>
         </div>
         <span className="helper-text">
-          Tell us if your roof already has any insulation installed
+          Vertel ons of uw dak reeds isolatie heeft geïnstalleerd
         </span>
       </div>
 
       {/* Current R-value - Only show if roof is insulated */}
       {formData.has_insulation === 'yes' && (
         <div className="form-group">
-          <label htmlFor="current_r_value">Current R-value (m²·K/W) *</label>
+          <label htmlFor="current_r_value">Huidige R-waarde (m²·K/W) *</label>
           <input
             type="number"
             id="current_r_value"
-            placeholder="e.g., 2.0"
+            placeholder="bijv. 2.0"
             value={formData.current_r_value}
             onChange={(e) => handleFieldChange('current_r_value', e.target.value)}
             className={errors.current_r_value ? 'error' : ''}
@@ -177,14 +177,14 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
             <span className="error-message">{errors.current_r_value}</span>
           )}
           <span className="helper-text">
-            Thermal resistance of your current insulation (typically 1.0 - 4.0)
+            Thermische weerstand van uw huidige isolatie (doorgaans 1.0 - 4.0)
           </span>
         </div>
       )}
 
       {/* Location Selection */}
       <div className="form-group">
-        <label>Belgian Region *</label>
+        <label>Belgische Regio *</label>
         <div className="icon-selection-group">
           {regions?.map((region) => (
             <button
@@ -208,9 +208,9 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
         )}
         {formData.location && (
           <div className="alert alert-success" style={{ marginTop: '12px' }}>
-            <strong>Region Selected:</strong> {formData.location}
+            <strong>Regio geselecteerd:</strong> {formData.location}
             <br />
-            <strong>Default Energy Price:</strong> €
+            <strong>Standaard energieprijs:</strong> €
             {regions
               ?.find((r) => r.name === formData.location)
               ?.default_energy_price.toFixed(3)}

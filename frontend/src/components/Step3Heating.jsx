@@ -71,14 +71,14 @@ const Step3Heating = ({ formData, setFormData, heatingSources, errors, setErrors
 
   return (
     <div className="form-section">
-      <h2>Step 3: Heating Source</h2>
+      <h2>Stap 3: Verwarmingsbron</h2>
       <p className="helper-text" style={{ marginBottom: '20px' }}>
-        Select your heating system to calculate energy savings and CO₂ reduction.
+        Selecteer uw verwarmingssysteem om energiebesparing en CO₂-reductie te berekenen.
       </p>
 
       {/* Heating Source Selection */}
       <div className="form-group">
-        <label>Heating Source *</label>
+        <label>Verwarmingsbron *</label>
         <div className="heating-source-grid">
           {heatingSources?.map((source) => (
             <button
@@ -104,11 +104,11 @@ const Step3Heating = ({ formData, setFormData, heatingSources, errors, setErrors
 
       {/* Energy Price */}
       <div className="form-group">
-        <label htmlFor="energy_price_per_kwh">Energy Price (€/kWh) *</label>
+        <label htmlFor="energy_price_per_kwh">Energieprijs (€/kWh) *</label>
         <input
           type="number"
           id="energy_price_per_kwh"
-          placeholder="e.g., 0.35"
+          placeholder="bijv. 0.35"
           value={formData.energy_price_per_kwh}
           onChange={(e) => handleFieldChange('energy_price_per_kwh', e.target.value)}
           className={errors.energy_price_per_kwh ? 'error' : ''}
@@ -119,18 +119,18 @@ const Step3Heating = ({ formData, setFormData, heatingSources, errors, setErrors
           <span className="error-message">{errors.energy_price_per_kwh}</span>
         )}
         <span className="helper-text">
-          Your current average energy price per kilowatt-hour (pre-filled from region selection)
+          Uw huidige gemiddelde energieprijs per kilowattuur (vooraf ingevuld op basis van regioselectie)
         </span>
       </div>
 
       {/* Selection Summary */}
       {selectedSource && (
         <div className="alert alert-success">
-          <strong>Heating Source:</strong> {selectedSource.label}
+          <strong>Verwarmingsbron:</strong> {selectedSource.label}
           <br />
-          <strong>CO₂ Intensity:</strong> {selectedSource.co2_intensity} kg CO₂/kWh
+          <strong>CO₂ intensiteit:</strong> {selectedSource.co2_intensity} kg CO₂/kWh
           <br />
-          <strong>Energy Price:</strong> €{parseFloat(formData.energy_price_per_kwh || 0).toFixed(3)}/kWh
+          <strong>Energieprijs:</strong> €{parseFloat(formData.energy_price_per_kwh || 0).toFixed(3)}/kWh
         </div>
       )}
     </div>

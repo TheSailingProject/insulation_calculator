@@ -8,46 +8,46 @@ const TARGET_R_VALUE = 6.0;
 const INSULATION_MATERIALS = [
   {
     id: 'glass_wool',
-    name: 'Glass Wool / Mineral Wool',
+    name: 'Glaswol / Minerale wol',
     category: 'Budget',
     cost_per_m2: 17.5,
     r_value_per_cm: 0.035,
     target_r_value: TARGET_R_VALUE,
-    description: 'Cost-effective traditional insulation. Good thermal performance.',
-    benefits: ['Most affordable option', 'Easy to install', 'Fire resistant', 'Good sound insulation'],
+    description: 'Kosteneffectieve traditionele isolatie. Goede thermische prestaties.',
+    benefits: ['Meest betaalbare optie', 'Gemakkelijk te installeren', 'Brandwerend', 'Goede geluidsisolatie'],
     icon: 'budget'
   },
   {
     id: 'pir_pur_foam',
-    name: 'PIR/PUR Foam Boards',
-    category: 'Mid-Range',
+    name: 'PIR/PUR Schuimplaten',
+    category: 'Middensegment',
     cost_per_m2: 35,
     r_value_per_cm: 0.028,
     target_r_value: TARGET_R_VALUE,
-    description: 'Excellent thermal performance with thin profile. Popular choice.',
-    benefits: ['High R-value per cm', 'Moisture resistant', 'Thin profile saves space', 'Long lifespan'],
+    description: 'Uitstekende thermische prestaties met dun profiel. Populaire keuze.',
+    benefits: ['Hoge R-waarde per cm', 'Vochtbestendig', 'Dun profiel bespaart ruimte', 'Lange levensduur'],
     icon: 'standard'
   },
   {
     id: 'wood_fiber',
-    name: 'Wood Fiber Boards',
+    name: 'Houtvezelborden',
     category: 'Premium Eco',
     cost_per_m2: 55,
     r_value_per_cm: 0.038,
     target_r_value: TARGET_R_VALUE,
-    description: 'Sustainable ecological insulation. Excellent moisture regulation.',
-    benefits: ['Eco-friendly & sustainable', 'Breathable material', 'Summer heat protection', 'Carbon negative'],
+    description: 'Duurzame ecologische isolatie. Uitstekende vochtregulatie.',
+    benefits: ['Milieuvriendelijk & duurzaam', 'Ademend materiaal', 'Zomerse warmtebescherming', 'CO₂-negatief'],
     icon: 'premium'
   },
   {
     id: 'eps_graphite',
-    name: 'EPS Graphite',
-    category: 'Mid-Range Plus',
+    name: 'EPS Grafiet',
+    category: 'Middensegment Plus',
     cost_per_m2: 28,
     r_value_per_cm: 0.032,
     target_r_value: TARGET_R_VALUE,
-    description: 'Enhanced EPS with graphite for better insulation. Great value.',
-    benefits: ['Good price-performance', 'Lightweight', 'Easy to cut and fit', 'Water resistant'],
+    description: 'Verbeterde EPS met grafiet voor betere isolatie. Uitstekende waarde.',
+    benefits: ['Goede prijs-kwaliteitverhouding', 'Lichtgewicht', 'Gemakkelijk te snijden en te passen', 'Waterbestendig'],
     icon: 'standard'
   }
 ];
@@ -91,18 +91,18 @@ const Step2InsulationMaterial = ({ formData, setFormData, errors, setErrors }) =
 
   return (
     <div className="form-section">
-      <h2>Step 2: Insulation Material</h2>
+      <h2>Stap 2: Isolatiemateriaal</h2>
       <p className="helper-text" style={{ marginBottom: '20px' }}>
-        Choose the insulation material that best fits your needs and budget.
+        Kies het isolatiemateriaal dat het beste bij uw behoeften en budget past.
       </p>
 
       {formData.roof_area && formData.roof_type && (
         <div className="alert alert-success" style={{ marginBottom: '20px' }}>
-          <strong>Your roof surface area:</strong>{' '}
+          <strong>Uw dakoppervlakte:</strong>{' '}
           {(parseFloat(formData.roof_area) * (formData.roof_type === 'pitched' ? 1.25 : 1.0)).toFixed(1)} m²
           {formData.roof_type === 'pitched' && (
             <>
-              {' '}(floor area: {formData.roof_area} m² × 1.25 pitch multiplier)
+              {' '}(vloeroppervlakte: {formData.roof_area} m² × 1.25 hellingsfactor)
             </>
           )}
         </div>
@@ -140,17 +140,17 @@ const Step2InsulationMaterial = ({ formData, setFormData, errors, setErrors }) =
                 </div>
                 {costInfo && (
                   <div className="material-total-cost">
-                    Total: €{costInfo.totalCost.toFixed(2)}
+                    Totaal: €{costInfo.totalCost.toFixed(2)}
                   </div>
                 )}
               </div>
 
               <div className="material-specs">
                 <div className="material-spec-item">
-                  <strong>Target R-value:</strong> {material.target_r_value.toFixed(1)} m²·K/W
+                  <strong>Doel R-waarde:</strong> {material.target_r_value.toFixed(1)} m²·K/W
                 </div>
                 <div className="material-spec-item">
-                  <strong>Thickness needed:</strong> ~{calculateThickness(material).toFixed(0)} cm
+                  <strong>Benodigde dikte:</strong> ~{calculateThickness(material).toFixed(0)} cm
                 </div>
               </div>
 
@@ -172,26 +172,26 @@ const Step2InsulationMaterial = ({ formData, setFormData, errors, setErrors }) =
 
       {selectedMaterial && (
         <div className="material-selection-summary">
-          <h4>Selected Material Summary</h4>
+          <h4>Gekozen materiaal overzicht</h4>
           <div className="summary-grid">
             <div className="summary-item">
-              <div className="summary-label">Material</div>
+              <div className="summary-label">Materiaal</div>
               <div className="summary-value">{selectedMaterial.name}</div>
             </div>
             <div className="summary-item">
-              <div className="summary-label">Cost per m²</div>
+              <div className="summary-label">Kosten per m²</div>
               <div className="summary-value">€{selectedMaterial.cost_per_m2.toFixed(2)}</div>
             </div>
             {calculateInsulationCost(selectedMaterial) && (
               <>
                 <div className="summary-item">
-                  <div className="summary-label">Roof Surface Area</div>
+                  <div className="summary-label">Dakoppervlakte</div>
                   <div className="summary-value">
                     {calculateInsulationCost(selectedMaterial).actualSurfaceArea.toFixed(1)} m²
                   </div>
                 </div>
                 <div className="summary-item highlight">
-                  <div className="summary-label">Total Project Cost</div>
+                  <div className="summary-label">Totale projectkosten</div>
                   <div className="summary-value">
                     €{calculateInsulationCost(selectedMaterial).totalCost.toFixed(2)}
                   </div>

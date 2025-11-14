@@ -1,10 +1,10 @@
 import React from 'react';
 
 const steps = [
-  { number: 1, label: 'Roof Info' },
-  { number: 2, label: 'Insulation' },
-  { number: 3, label: 'Heating' },
-  { number: 4, label: 'Results' }
+  { number: 1, label: 'Dakinformatie' },
+  { number: 2, label: 'Isolatiemateriaal' },
+  { number: 3, label: 'Verwarmingsbron' },
+  { number: 4, label: 'Resultaten' }
 ];
 
 const ProgressBar = ({ currentStep }) => {
