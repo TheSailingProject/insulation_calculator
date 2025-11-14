@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import ProgressBar from './components/ProgressBar';
-import Step1Location from './components/Step1Location';
-import Step2RoofDetails from './components/Step2RoofDetails';
+import Step1RoofInfo from './components/Step1RoofInfo';
+import Step2InsulationMaterial, { INSULATION_MATERIALS } from './components/Step2InsulationMaterial';
 import Step3Heating from './components/Step3Heating';
 import Results from './components/Results';
 import { getRegions, calculateSavings, downloadPdfReport } from './services/api';
@@ -13,7 +13,8 @@ import {
   validateProposedRValue,
   validateHeatingSource,
   validateEnergyPrice,
-  validateInsulationCost
+  validateRoofType,
+  validateInsulationMaterial
 } from './utils/validation';
 
 function App() {
@@ -21,11 +22,12 @@ function App() {
   const [formData, setFormData] = useState({
     location: '',
     roof_area: '',
+    roof_type: '',
     current_r_value: '',
     proposed_r_value: '',
+    insulation_material: '',
     heating_source: '',
-    energy_price_per_kwh: '',
-    insulation_upgrade_cost: ''
+    energy_price_per_kwh: ''
   });
   const [errors, setErrors] = useState({});
   const [regions, setRegions] = useState(null);
@@ -57,9 +59,9 @@ function App() {
     const newErrors = {};
 
     if (step === 1) {
-      newErrors.location = validateLocation(formData.location);
-    } else if (step === 2) {
+      // Validate all Step 1 fields
       newErrors.roof_area = validateRoofArea(formData.roof_area);
+      newErrors.roof_type = validateRoofType(formData.roof_type);
       newErrors.current_r_value = validateRValue(
         formData.current_r_value,
         'Current R-value'
@@ -68,13 +70,15 @@ function App() {
         formData.current_r_value,
         formData.proposed_r_value
       );
+      newErrors.location = validateLocation(formData.location);
+    } else if (step === 2) {
+      // Validate insulation material selection
+      newErrors.insulation_material = validateInsulationMaterial(formData.insulation_material);
     } else if (step === 3) {
+      // Validate heating source and energy price
       newErrors.heating_source = validateHeatingSource(formData.heating_source);
       newErrors.energy_price_per_kwh = validateEnergyPrice(
         formData.energy_price_per_kwh
-      );
-      newErrors.insulation_upgrade_cost = validateInsulationCost(
-        formData.insulation_upgrade_cost
       );
     }
 
@@ -98,16 +102,21 @@ function App() {
       setError(null);
 
       try {
+        // Calculate insulation cost based on selected material
+        const selectedMaterial = INSULATION_MATERIALS.find(m => m.id === formData.insulation_material);
+        const roofArea = parseFloat(formData.roof_area);
+        const pitchMultiplier = formData.roof_type === 'pitched' ? 1.25 : 1.0;
+        const actualSurfaceArea = roofArea * pitchMultiplier;
+        const calculatedInsulationCost = actualSurfaceArea * selectedMaterial.cost_per_m2;
+
         const requestData = {
           location: formData.location,
-          roof_area: parseFloat(formData.roof_area),
+          roof_area: roofArea,
           current_r_value: parseFloat(formData.current_r_value),
           proposed_r_value: parseFloat(formData.proposed_r_value),
           heating_source: formData.heating_source,
           energy_price_per_kwh: parseFloat(formData.energy_price_per_kwh),
-          insulation_upgrade_cost: formData.insulation_upgrade_cost
-            ? parseFloat(formData.insulation_upgrade_cost)
-            : null
+          insulation_upgrade_cost: calculatedInsulationCost
         };
 
         const result = await calculateSavings(requestData);
@@ -135,11 +144,12 @@ function App() {
     setFormData({
       location: '',
       roof_area: '',
+      roof_type: '',
       current_r_value: '',
       proposed_r_value: '',
+      insulation_material: '',
       heating_source: '',
-      energy_price_per_kwh: '',
-      insulation_upgrade_cost: ''
+      energy_price_per_kwh: ''
     });
     setErrors({});
     setResults(null);
@@ -151,16 +161,21 @@ function App() {
     setError(null);
 
     try {
+      // Calculate insulation cost based on selected material
+      const selectedMaterial = INSULATION_MATERIALS.find(m => m.id === formData.insulation_material);
+      const roofArea = parseFloat(formData.roof_area);
+      const pitchMultiplier = formData.roof_type === 'pitched' ? 1.25 : 1.0;
+      const actualSurfaceArea = roofArea * pitchMultiplier;
+      const calculatedInsulationCost = actualSurfaceArea * selectedMaterial.cost_per_m2;
+
       const requestData = {
         location: formData.location,
-        roof_area: parseFloat(formData.roof_area),
+        roof_area: roofArea,
         current_r_value: parseFloat(formData.current_r_value),
         proposed_r_value: parseFloat(formData.proposed_r_value),
         heating_source: formData.heating_source,
         energy_price_per_kwh: parseFloat(formData.energy_price_per_kwh),
-        insulation_upgrade_cost: formData.insulation_upgrade_cost
-          ? parseFloat(formData.insulation_upgrade_cost)
-          : null
+        insulation_upgrade_cost: calculatedInsulationCost
       };
 
       await downloadPdfReport(requestData);
@@ -200,7 +215,7 @@ function App() {
           )}
 
           {currentStep === 1 && (
-            <Step1Location
+            <Step1RoofInfo
               formData={formData}
               setFormData={setFormData}
               regions={regions}
@@ -210,7 +225,7 @@ function App() {
           )}
 
           {currentStep === 2 && (
-            <Step2RoofDetails
+            <Step2InsulationMaterial
               formData={formData}
               setFormData={setFormData}
               errors={errors}

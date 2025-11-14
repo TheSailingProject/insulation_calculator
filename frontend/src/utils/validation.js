@@ -93,3 +93,20 @@ export const validateInsulationCost = (cost) => {
   }
   return null;
 };
+
+export const validateRoofType = (roofType) => {
+  if (!roofType) {
+    return 'Please select a roof type';
+  }
+  if (roofType !== 'flat' && roofType !== 'pitched') {
+    return 'Invalid roof type';
+  }
+  return null;
+};
+
+export const validateInsulationMaterial = (material) => {
+  if (!material) {
+    return 'Please select an insulation material';
+  }
+  return null;
+};
