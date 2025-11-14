@@ -32,8 +32,13 @@ const corsHeaders = {
 
 // Calculate U-value from R-value
 function calculateUValue(rValue) {
-  if (rValue <= 0) {
-    throw new Error('R-value must be greater than 0');
+  if (rValue < 0) {
+    throw new Error('R-value cannot be negative');
+  }
+  if (rValue === 0) {
+    // For uninsulated roofs (R-value = 0), use a very high U-value
+    // Typical uninsulated roof U-value is around 5.0 W/m²K
+    return 5.0;
   }
   return 1.0 / rValue;
 }
@@ -89,10 +94,10 @@ function performFullCalculation(data) {
     throw new Error('Roof area must be between 0 and 10000 m²');
   }
   if (current_r_value < 0 || current_r_value > 20) {
-    throw new Error('Current R-value must be between 0 and 20');
+    throw new Error('Current R-value must be between 0 and 20 (0 for uninsulated roofs)');
   }
   if (proposed_r_value <= 0 || proposed_r_value > 20) {
-    throw new Error('Proposed R-value must be between 0 and 20');
+    throw new Error('Proposed R-value must be greater than 0 and up to 20');
   }
   if (proposed_r_value <= current_r_value) {
     throw new Error('Proposed R-value must be greater than current R-value');
