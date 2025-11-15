@@ -20,6 +20,12 @@ const CONFIG = {
     'electric': 0.166,
     'heat_pump': 0.055
   },
+  heatingSourceLabels: {
+    'gas': 'Aardgas',
+    'oil': 'Stookolie',
+    'electric': 'Elektrische verwarming',
+    'heat_pump': 'Warmtepomp'
+  },
   defaultInsulationCostPerSqm: 45.0
 };
 
@@ -29,6 +35,17 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
+
+// Rate limiting configuration
+const RATE_LIMIT = {
+  maxRequests: 10, // Maximum requests per window
+  windowMs: 60000, // Time window in milliseconds (1 minute)
+  enabled: true // Set to false to disable rate limiting
+};
+
+// In-memory rate limit tracker (resets on worker restart)
+// For production, use Cloudflare KV or Durable Objects for persistent tracking
+const rateLimitMap = new Map();
 
 // Calculate U-value from R-value
 function calculateUValue(rValue) {
@@ -163,6 +180,59 @@ function performFullCalculation(data) {
   };
 }
 
+// Rate limiting check
+function checkRateLimit(request) {
+  if (!RATE_LIMIT.enabled) {
+    return { allowed: true };
+  }
+
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const now = Date.now();
+
+  // Get or create rate limit entry for this IP
+  let ipData = rateLimitMap.get(ip);
+
+  if (!ipData) {
+    ipData = { count: 1, resetTime: now + RATE_LIMIT.windowMs };
+    rateLimitMap.set(ip, ipData);
+    return { allowed: true };
+  }
+
+  // Reset counter if window has passed
+  if (now > ipData.resetTime) {
+    ipData.count = 1;
+    ipData.resetTime = now + RATE_LIMIT.windowMs;
+    rateLimitMap.set(ip, ipData);
+    return { allowed: true };
+  }
+
+  // Increment counter
+  ipData.count++;
+  rateLimitMap.set(ip, ipData);
+
+  // Check if limit exceeded
+  if (ipData.count > RATE_LIMIT.maxRequests) {
+    const resetIn = Math.ceil((ipData.resetTime - now) / 1000);
+    return {
+      allowed: false,
+      resetIn,
+      retryAfter: resetIn
+    };
+  }
+
+  return { allowed: true };
+}
+
+// Cleanup old rate limit entries periodically
+function cleanupRateLimitMap() {
+  const now = Date.now();
+  for (const [ip, data] of rateLimitMap.entries()) {
+    if (now > data.resetTime + RATE_LIMIT.windowMs) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}
+
 // Handle requests
 async function handleRequest(request) {
   const url = new URL(request.url);
@@ -173,6 +243,28 @@ async function handleRequest(request) {
     return new Response(null, {
       headers: corsHeaders
     });
+  }
+
+  // Check rate limit for non-OPTIONS requests
+  const rateCheck = checkRateLimit(request);
+  if (!rateCheck.allowed) {
+    return new Response(JSON.stringify({
+      error: 'Te veel verzoeken',
+      detail: `Maximaal ${RATE_LIMIT.maxRequests} verzoeken per minuut toegestaan. Probeer het over ${rateCheck.resetIn} seconden opnieuw.`,
+      retry_after: rateCheck.retryAfter
+    }), {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Retry-After': rateCheck.retryAfter.toString(),
+        ...corsHeaders
+      }
+    });
+  }
+
+  // Periodic cleanup (1% chance per request to avoid overhead)
+  if (Math.random() < 0.01) {
+    cleanupRateLimitMap();
   }
 
   try {
@@ -216,22 +308,22 @@ async function handleRequest(request) {
         heating_sources: [
           {
             value: 'gas',
-            label: 'Natural Gas',
+            label: CONFIG.heatingSourceLabels['gas'],
             co2_intensity: CONFIG.co2Intensity['gas']
           },
           {
             value: 'oil',
-            label: 'Heating Oil',
+            label: CONFIG.heatingSourceLabels['oil'],
             co2_intensity: CONFIG.co2Intensity['oil']
           },
           {
             value: 'electric',
-            label: 'Electric Heating',
+            label: CONFIG.heatingSourceLabels['electric'],
             co2_intensity: CONFIG.co2Intensity['electric']
           },
           {
             value: 'heat_pump',
-            label: 'Heat Pump',
+            label: CONFIG.heatingSourceLabels['heat_pump'],
             co2_intensity: CONFIG.co2Intensity['heat_pump']
           }
         ]

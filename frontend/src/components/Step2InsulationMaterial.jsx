@@ -1,5 +1,6 @@
 import React from 'react';
 import { validateInsulationMaterial } from '../utils/validation';
+import { trackMaterialSelection } from '../utils/analytics';
 
 // Belgian market insulation materials with realistic pricing
 // Target R-value of 6.0 meets Belgian EPB 2023 standards for new buildings
@@ -64,6 +65,9 @@ const Step2InsulationMaterial = ({ formData, setFormData, errors, setErrors }) =
     // Clear error
     const error = validateInsulationMaterial(material.id);
     setErrors({ ...errors, insulation_material: error });
+
+    // Track material selection
+    trackMaterialSelection(material.id);
   };
 
   const calculateThickness = (material) => {

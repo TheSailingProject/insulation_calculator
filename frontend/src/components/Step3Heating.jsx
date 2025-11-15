@@ -3,6 +3,7 @@ import {
   validateHeatingSource,
   validateEnergyPrice
 } from '../utils/validation';
+import { trackHeatingSourceSelection } from '../utils/analytics';
 
 // Heating source icons mapping
 const HEATING_ICONS = {
@@ -60,6 +61,8 @@ const Step3Heating = ({ formData, setFormData, heatingSources, errors, setErrors
     let error = null;
     if (field === 'heating_source') {
       error = validateHeatingSource(value);
+      // Track heating source selection
+      trackHeatingSourceSelection(value);
     } else if (field === 'energy_price_per_kwh') {
       error = validateEnergyPrice(value);
     }

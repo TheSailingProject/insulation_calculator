@@ -5,6 +5,10 @@ import {
   validateLocation,
   validateRoofType
 } from '../utils/validation';
+import {
+  trackRegionSelection,
+  trackRoofTypeSelection
+} from '../utils/analytics';
 
 const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) => {
   const handleFieldChange = (field, value) => {
@@ -16,6 +20,13 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
       if (selectedRegion) {
         updatedFormData.energy_price_per_kwh = selectedRegion.default_energy_price.toFixed(3);
       }
+      // Track region selection
+      trackRegionSelection(value);
+    }
+
+    // Track roof type selection
+    if (field === 'roof_type') {
+      trackRoofTypeSelection(value);
     }
 
     // If insulation status changes to "no", reset current R-value to 0
@@ -177,7 +188,7 @@ const Step1RoofInfo = ({ formData, setFormData, regions, errors, setErrors }) =>
             <span className="error-message">{errors.current_r_value}</span>
           )}
           <span className="helper-text">
-            Thermische weerstand van uw huidige isolatie (doorgaans 1.0 - 4.0)
+            Thermische weerstand van uw huidige isolatie. <strong>Niet zeker?</strong> Typische waarden: 5 cm glaswol ≈ R 1.4, 10 cm ≈ R 2.9, 15 cm ≈ R 4.3
           </span>
         </div>
       )}

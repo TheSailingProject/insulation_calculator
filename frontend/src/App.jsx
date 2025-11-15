@@ -15,6 +15,12 @@ import {
   validateRoofType,
   validateInsulationMaterial
 } from './utils/validation';
+import {
+  initAnalytics,
+  trackStepCompletion,
+  trackCalculationComplete,
+  trackPdfDownload
+} from './utils/analytics';
 
 function App() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -40,6 +46,9 @@ function App() {
 
   // Load configuration data on mount
   useEffect(() => {
+    // Initialize analytics
+    initAnalytics();
+
     const loadConfig = async () => {
       try {
         const config = await getRegions();
@@ -65,7 +74,7 @@ function App() {
 
       // Validate has_insulation selection
       if (!formData.has_insulation) {
-        newErrors.has_insulation = 'Please select whether your roof is currently insulated';
+        newErrors.has_insulation = 'Selecteer of uw dak momenteel geïsoleerd is';
       }
 
       // Only validate current R-value if roof has insulation
@@ -128,6 +137,12 @@ function App() {
         const result = await calculateSavings(requestData);
         setResults(result);
         setCurrentStep(4);
+
+        // Track successful calculation
+        trackCalculationComplete({
+          payback_period: result.payback_period,
+          annual_savings: result.annual_cost_savings
+        });
       } catch (err) {
         setError(err.message || 'Failed to calculate savings. Please try again.');
       } finally {
@@ -135,6 +150,9 @@ function App() {
       }
     } else {
       setCurrentStep(currentStep + 1);
+
+      // Track step completion
+      trackStepCompletion(currentStep);
     }
   };
 
@@ -186,6 +204,9 @@ function App() {
       };
 
       await downloadPdfReport(requestData);
+
+      // Track PDF download
+      trackPdfDownload();
     } catch (err) {
       setError(err.message || 'Failed to generate PDF. Please try again.');
     } finally {
